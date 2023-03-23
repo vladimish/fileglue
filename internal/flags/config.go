@@ -1,40 +1,22 @@
 package flags
 
 import (
-	"flag"
-	"github.com/rsc/getopt"
+	"regexp"
 )
 
-var debug bool
+var path string
 var ignore bool
+var exclude string
+var excludeRegex *regexp.Regexp
 
-func init() {
-	initDebugFlag()
-	initIgnoreFlag()
-}
-
-func initDebugFlag() {
-	const (
-		value = false
-		usage = "Print debug information."
-	)
-	flag.BoolVar(&debug, "debug", value, usage)
-	getopt.Alias("d", "debug")
-}
-
-func initIgnoreFlag() {
-	const (
-		value = false
-		usage = "By default, fileglue declines all the files which contains byte of value less then 40 except some escape sequences. Passing this flag will allow to read all files."
-	)
-	flag.BoolVar(&ignore, "ignore", value, usage)
-	getopt.Alias("i", "ignore")
-}
-
-func GetDebug() bool {
-	return debug
+func GetPath() string {
+	return path
 }
 
 func GetIgnore() bool {
 	return ignore
+}
+
+func GetExcludeRegex() *regexp.Regexp {
+	return excludeRegex
 }

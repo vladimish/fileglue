@@ -3,17 +3,24 @@ package core
 import (
 	"flag"
 	"fmt"
-	"github.com/vladimish/fileglue/internal/flags"
-	"github.com/vladimish/fileglue/pkg/utils"
 	"io/fs"
 	"io/ioutil"
 	"os"
+
+	"github.com/vladimish/fileglue/internal/flags"
+	"github.com/vladimish/fileglue/pkg/utils"
 )
 
 var path string
 
 func Start() error {
-	checkPath()
+	flag.Usage = func() {
+		fmt.Println("Usage: fileglue [path] [flags]")
+		fmt.Println("Flags:")
+		flag.PrintDefaults()
+	}
+
+	path = flags.GetPath()
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return err
@@ -25,19 +32,10 @@ func Start() error {
 	return nil
 }
 
-// checkPath checks if path is empty and making it './' if so.
-func checkPath() {
-	path = flag.Arg(0)
-	if path == "" {
-		path = "." + string(os.PathSeparator)
-	}
-	if flags.GetDebug() {
-		fmt.Println(path)
-	}
-}
-
 // printRecursively searches for matching files and prints them to stdout.
 func printRecursively(files []fs.FileInfo, path string) error {
+	excludeRegex := flags.GetExcludeRegex()
+
 	// Iterate over all files and directories inside current directory.
 	for _, f := range files {
 		if f.IsDir() {
@@ -50,8 +48,12 @@ func printRecursively(files []fs.FileInfo, path string) error {
 				return err
 			}
 		} else {
+			filePath := path + f.Name()
+			if excludeRegex != nil && excludeRegex.MatchString(filePath) {
+				continue
+			}
 			// Open and read whole file.
-			file, err := os.Open(path + f.Name())
+			file, err := os.Open(filePath)
 			if err != nil {
 				return err
 			}
@@ -59,15 +61,16 @@ func printRecursively(files []fs.FileInfo, path string) error {
 
 			if utils.IsText(data) || flags.GetIgnore() {
 				// Print header.
-				fmt.Println(flags.GenerateTop(path + f.Name()))
+				fmt.Println(flags.GenerateTop(filePath))
 
 				fmt.Println(string(data))
 
 				// Print footer.
-				fmt.Println(flags.GenerateBottom(path + f.Name()))
-			} else if flags.GetDebug() {
-				fmt.Println("File", path+f.Name(), "skipped due to not corresponding to UTF-8 format.")
+				fmt.Println(flags.GenerateBottom(filePath))
 			}
+			//else if flags.GetDebug() {
+			//	fmt.Println("File", filePath, "skipped due to not corresponding to UTF-8 format.")
+			//}
 		}
 	}
 
