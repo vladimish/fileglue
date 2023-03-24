@@ -30,7 +30,7 @@ To print the contents of all text files in the current directory:
 
 
 ```bash
-fileglue
+fileglue > res.txt
 ```
 
 To print the contents of all text files in a specific directory:
