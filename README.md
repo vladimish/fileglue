@@ -1,7 +1,7 @@
 # FileGlue
 
 FileGlue is a simple command-line utility that recursively reads and prints the content of all text files in a 
-specified directory, with optional custom headers and footers written in pure go. 
+specified directory, with optional custom headers and footers written in a pure go. 
 
 ## Installation
 

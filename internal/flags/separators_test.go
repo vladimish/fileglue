@@ -1,12 +1,15 @@
 package flags
 
 import (
-	"flag"
 	"testing"
 )
 
+func TestMain(m *testing.M) {
+	Initialize()
+	m.Run()
+}
+
 func TestGenerateTop(t *testing.T) {
-	flag.Set("top", "@PATH:")
 	res := GenerateTop("./test.txt")
 	excepted := "./test.txt:"
 	if res != excepted {
@@ -15,9 +18,8 @@ func TestGenerateTop(t *testing.T) {
 }
 
 func TestGenerateBottom(t *testing.T) {
-	flag.Set("bottom", "@PATH:")
 	res := GenerateBottom("./test.txt")
-	excepted := "./test.txt:"
+	excepted := "==="
 	if res != excepted {
 		t.Errorf("Excepted %s, got %s", excepted, res)
 	}
